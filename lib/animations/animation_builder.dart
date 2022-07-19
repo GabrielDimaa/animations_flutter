@@ -12,6 +12,9 @@ class AnimationBuilder extends StatefulWidget {
 class _AnimationBuilderState extends State<AnimationBuilder> with TickerProviderStateMixin {
   late AnimationController controller;
   late AnimationController controllerRelogio;
+  late AnimationController controllerExpanded;
+
+  bool expanded = false;
 
   @override
   void initState() {
@@ -25,6 +28,11 @@ class _AnimationBuilderState extends State<AnimationBuilder> with TickerProvider
       duration: const Duration(seconds: 12),
       vsync: this,
     )..repeat();
+    controllerExpanded = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+      upperBound: 0.5,
+    );
   }
 
   @override
@@ -105,6 +113,25 @@ class _AnimationBuilderState extends State<AnimationBuilder> with TickerProvider
                   ),
                 ),
               ),
+              ListTile(
+                title: const Text("Expansion tile"),
+                trailing: RotationTransition(
+                  turns: Tween(begin: 0.0, end: 1.0).animate(controllerExpanded),
+                  child: const Icon(
+                    Icons.expand_more,
+                    size: 40,
+                    color: Colors.black54,
+                  ),
+                ),
+                onTap: () => setState(() {
+                  if (expanded) {
+                    controllerExpanded.reverse(from: 0.5);
+                  } else {
+                    controllerExpanded.forward(from: 0.0);
+                  }
+                  expanded = !expanded;
+                }),
+              ),
             ],
           ),
         ),
@@ -116,6 +143,7 @@ class _AnimationBuilderState extends State<AnimationBuilder> with TickerProvider
   void dispose() {
     controller.dispose();
     controllerRelogio.dispose();
+    controllerExpanded.dispose();
     super.dispose();
   }
 }
